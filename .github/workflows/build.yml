@@ -28,9 +28,9 @@ jobs:
           dotnet-version: 10.0.x
       - name: Restore
         run: dotnet restore Laminar.slnx
+      - name: Check formatting
+        run: dotnet format Laminar.slnx --no-restore --verify-no-changes --severity info
       - name: Build
         run: dotnet build Laminar.slnx --configuration Release --no-restore --warnaserror
       - name: Unit tests
         run: dotnet test --solution Laminar.slnx --configuration Release --no-build
-      - name: Check formatting
-        run: dotnet format Laminar.slnx --no-restore --verify-no-changes --severity info
