@@ -2,4 +2,7 @@
   <Folder Name="/src/">
     <Project Path="src/Laminar/Laminar.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Laminar.Tests/Laminar.Tests.csproj" />
+  </Folder>
 </Solution>
