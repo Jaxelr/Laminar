@@ -7,8 +7,8 @@ No HTTP dependency, pipelines, or registries.
 ## Usage
 
 ```csharp
-using Laminar;
 using System.Threading.RateLimiting;
+using Laminar;
 
 using var limiter = new TokenBucketRateLimiter(new TokenBucketRateLimiterOptions
 {
@@ -21,21 +21,21 @@ using var limiter = new TokenBucketRateLimiter(new TokenBucketRateLimiterOptions
 });
 
 Func<string> hello = () => "Hello, world!";
-var limited = hello.AsOperation().RateLimitedBy(limiter);
+var limited = hello.RateLimitedBy(limiter);
 
 string result = await limited(CancellationToken.None);
 ```
 
-`AsOperation()` adapts `Action`, `Func<T>`, and `Task`-returning delegates,
-including those accepting a cancellation token. The common contract is
-`Func<CancellationToken, ValueTask<T>>` (or `ValueTask` without a result).
+Every pattern adapts `Action`, `Func<T>`, and `Task`- or `ValueTask`-returning
+delegates automatically. Async delegates may accept a cancellation token.
+Invoke the returned delegate with `await guarded(cancellationToken)`.
 Delegates with other arguments can be bound through a lambda.
 
 ## Patterns
 
 ```csharp
-Func<CancellationToken, ValueTask<string>> operation =
-    cancellationToken => ValueTask.FromResult("Hello, world!");
+Func<CancellationToken, Task<string>> operation =
+    cancellationToken => Task.FromResult("Hello, world!");
 
 var breaker = new CircuitBreakerResilience(new CircuitBreakerOptions
 {

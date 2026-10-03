@@ -3,6 +3,46 @@ namespace Laminar;
 public static class OperationExtensions
 {
     public static Func<CancellationToken, ValueTask<TResult>> ResilientWith<TResult>(
+        this Func<TResult> operation,
+        IOperationResilience resilience)
+        => operation.AsOperation().ResilientWith(resilience);
+
+    public static Func<CancellationToken, ValueTask> ResilientWith(
+        this Action operation,
+        IOperationResilience resilience)
+        => operation.AsOperation().ResilientWith(resilience);
+
+    public static Func<CancellationToken, ValueTask<TResult>> ResilientWith<TResult>(
+        this Func<Task<TResult>> operation,
+        IOperationResilience resilience)
+        => operation.AsOperation().ResilientWith(resilience);
+
+    public static Func<CancellationToken, ValueTask> ResilientWith(
+        this Func<Task> operation,
+        IOperationResilience resilience)
+        => operation.AsOperation().ResilientWith(resilience);
+
+    public static Func<CancellationToken, ValueTask<TResult>> ResilientWith<TResult>(
+        this Func<CancellationToken, Task<TResult>> operation,
+        IOperationResilience resilience)
+        => operation.AsOperation().ResilientWith(resilience);
+
+    public static Func<CancellationToken, ValueTask> ResilientWith(
+        this Func<CancellationToken, Task> operation,
+        IOperationResilience resilience)
+        => operation.AsOperation().ResilientWith(resilience);
+
+    public static Func<CancellationToken, ValueTask<TResult>> ResilientWith<TResult>(
+        this Func<ValueTask<TResult>> operation,
+        IOperationResilience resilience)
+        => operation.AsOperation().ResilientWith(resilience);
+
+    public static Func<CancellationToken, ValueTask> ResilientWith(
+        this Func<ValueTask> operation,
+        IOperationResilience resilience)
+        => operation.AsOperation().ResilientWith(resilience);
+
+    public static Func<CancellationToken, ValueTask<TResult>> ResilientWith<TResult>(
         this Func<CancellationToken, ValueTask<TResult>> operation,
         IOperationResilience resilience)
     {
@@ -83,5 +123,26 @@ public static class OperationExtensions
         ArgumentNullException.ThrowIfNull(operation);
         Func<CancellationToken, Task> cancellable = _ => operation();
         return cancellable.AsOperation();
+    }
+
+    public static Func<CancellationToken, ValueTask<TResult>> AsOperation<TResult>(
+        this Func<ValueTask<TResult>> operation)
+    {
+        ArgumentNullException.ThrowIfNull(operation);
+        return cancellationToken =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return operation();
+        };
+    }
+
+    public static Func<CancellationToken, ValueTask> AsOperation(this Func<ValueTask> operation)
+    {
+        ArgumentNullException.ThrowIfNull(operation);
+        return cancellationToken =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return operation();
+        };
     }
 }
