@@ -1,0 +1,35 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_NOLOGO: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Restore
+        run: dotnet restore Laminar.slnx
+      - name: Build
+        run: dotnet build Laminar.slnx --configuration Release --no-restore --warnaserror
+      - name: Unit tests
+        run: dotnet test --solution Laminar.slnx --configuration Release --no-build
+      - name: Check formatting
+        run: dotnet format Laminar.slnx --no-restore --verify-no-changes --severity info
