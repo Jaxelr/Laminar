@@ -92,22 +92,3 @@ public sealed class CustomResilience : IOperationResilience
 
 var decorated = operation.ResilientWith(new CustomResilience());
 ```
-
-## Development
-
-Source files under `src\Laminar` are grouped into `Exceptions`, `Options`,
-`Extensions`, and `Resilience` directories. The `IOperationResilience` contract and
-shared `FailureHandling` helper remain at the project root. All types retain the
-`Laminar` namespace.
-
-Tests under `tests\Laminar.Tests` mirror these groups in `ExceptionsTests`,
-`OptionsTests`, `ExtensionsTests`, and `ResilienceTests` directories.
-`DefaultFailureHandlingTests` remains at the test project root, with reusable helpers
-in `Helpers`. Test namespaces are unchanged. Shared test imports are declared as `Using` items in
-`Laminar.Tests.csproj`, including the static `TestSupport` import.
-
-```text
-dotnet build Laminar.slnx --configuration Release --warnaserror
-dotnet test --solution Laminar.slnx --configuration Release --no-build
-dotnet format Laminar.slnx --verify-no-changes --severity info
-```
