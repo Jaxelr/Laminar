@@ -92,3 +92,10 @@ public sealed class CustomResilience : IOperationResilience
 
 var decorated = operation.ResilientWith(new CustomResilience());
 ```
+
+## Contributing
+
+Issues and pull requests are welcome. For larger changes, open an issue first to
+discuss the approach. Keep contributions focused, follow the existing code style,
+and include tests and documentation updates for behavior changes. Before submitting
+a pull request, ensure the solution builds, tests pass, and formatting is clean.
