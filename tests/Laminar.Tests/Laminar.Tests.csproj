@@ -9,6 +9,12 @@
     <NoWarn>$(NoWarn);xUnit1051</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <Using Include="Laminar" />
+    <Using Include="Laminar.Tests.Helpers" />
+    <Using Include="Xunit" />
+    <Using Include="Laminar.Tests.Helpers.TestSupport" Static="true" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="xunit.v3" Version="4.0.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
     <PackageReference Include="coverlet.MTP" Version="10.1.0" />
