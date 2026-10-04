@@ -4,6 +4,9 @@ Small, operation-first resilience for .NET 10. Decorate delegates with rate
 limiting, retry, cooperative timeout, circuit breaking, or your own pattern.
 No HTTP dependency, pipelines, or registries.
 
+> **Alpha:** This package is in the alpha stage. Its public APIs may change,
+> including breaking changes, before a stable release.
+
 ## Usage
 
 ```csharp
