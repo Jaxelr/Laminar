@@ -7,6 +7,13 @@
     <File Path="README.md" />
     <File Path="global.json" />
   </Folder>
+  <Folder Name="/Solution Items/.github/">
+    <File Path=".github/copilot-instructions.md" />
+  </Folder>
+  <Folder Name="/Solution Items/.github/workflows/">
+    <File Path=".github/workflows/build.yml" />
+    <File Path=".github/workflows/prerelease.yml" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/Laminar/Laminar.csproj" />
   </Folder>
