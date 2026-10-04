@@ -1,5 +1,8 @@
 namespace Laminar;
 
+/// <summary>
+/// Opens after consecutive handled failures and allows one recovery probe after the break duration.
+/// </summary>
 public sealed class CircuitBreakerResilience : IOperationResilience
 {
     private readonly CircuitBreakerOptions options;
@@ -10,6 +13,9 @@ public sealed class CircuitBreakerResilience : IOperationResilience
     private long generation;
     private long openedAt;
 
+    /// <summary>
+    /// Initializes a shared circuit breaker, using default options when none are supplied.
+    /// </summary>
     public CircuitBreakerResilience(CircuitBreakerOptions? options = null)
     {
         this.options = options ?? new CircuitBreakerOptions();
@@ -19,6 +25,9 @@ public sealed class CircuitBreakerResilience : IOperationResilience
         ArgumentNullException.ThrowIfNull(this.options.TimeProvider);
     }
 
+    /// <summary>
+    /// Returns an operation guarded by this breaker's shared state, rejecting calls while the circuit denies admission.
+    /// </summary>
     public Func<CancellationToken, ValueTask<TResult>> Apply<TResult>(
         Func<CancellationToken, ValueTask<TResult>> operation)
     {

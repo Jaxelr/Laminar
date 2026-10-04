@@ -1,10 +1,16 @@
 namespace Laminar;
 
+/// <summary>
+/// Applies cooperative cancellation at a deadline, waits for completion, and rejects late results.
+/// </summary>
 public sealed class TimeoutResilience : IOperationResilience
 {
     private readonly TimeSpan timeout;
     private readonly TimeProvider timeProvider;
 
+    /// <summary>
+    /// Initializes a cooperative timeout, using the system time provider when none is supplied.
+    /// </summary>
     public TimeoutResilience(TimeSpan timeout, TimeProvider? timeProvider = null)
     {
         FailureHandling.ValidateTimer(timeout, nameof(timeout));
@@ -12,6 +18,9 @@ public sealed class TimeoutResilience : IOperationResilience
         this.timeProvider = timeProvider ?? TimeProvider.System;
     }
 
+    /// <summary>
+    /// Returns an operation with a linked deadline token, preserving caller cancellation separately from timeout rejection.
+    /// </summary>
     public Func<CancellationToken, ValueTask<TResult>> Apply<TResult>(
         Func<CancellationToken, ValueTask<TResult>> operation)
     {

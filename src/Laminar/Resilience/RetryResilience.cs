@@ -1,9 +1,15 @@
 namespace Laminar;
 
+/// <summary>
+/// Retries handled operation failures within a per-invocation budget, with an optional delay.
+/// </summary>
 public sealed class RetryResilience : IOperationResilience
 {
     private readonly RetryOptions options;
 
+    /// <summary>
+    /// Initializes retry behavior with the supplied options.
+    /// </summary>
     public RetryResilience(RetryOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
@@ -14,6 +20,9 @@ public sealed class RetryResilience : IOperationResilience
         this.options = options;
     }
 
+    /// <summary>
+    /// Returns an operation that retries handled failures and stops retrying when the caller cancels.
+    /// </summary>
     public Func<CancellationToken, ValueTask<TResult>> Apply<TResult>(
         Func<CancellationToken, ValueTask<TResult>> operation)
     {
