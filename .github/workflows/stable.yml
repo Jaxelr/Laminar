@@ -19,6 +19,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
+      packages: write
     env:
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
       DOTNET_NOLOGO: 1
@@ -45,4 +46,11 @@ jobs:
       - name: Publish to nuget.org
         env:
           NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
-        run: dotnet nuget push "artifacts\*.nupkg" --source https://api.nuget.org/v3/index.json --api-key $env:NUGET_API_KEY
+        run: dotnet nuget push "artifacts\*.nupkg" --source https://api.nuget.org/v3/index.json --api-key $env:NUGET_API_KEY --skip-duplicate
+      - name: Publish to GitHub Packages
+        env:
+          NUGET_API_KEY: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $source = "https://nuget.pkg.github.com/$env:GITHUB_REPOSITORY_OWNER/index.json"
+          $env:NuGetPackageSourceCredentials_github = "Username=$env:GITHUB_REPOSITORY_OWNER;Password=$env:NUGET_API_KEY;ValidAuthenticationTypes=Basic"
+          dotnet nuget add source $source --name github && dotnet nuget push "artifacts\*.nupkg" --source github --api-key $env:NUGET_API_KEY --skip-duplicate
