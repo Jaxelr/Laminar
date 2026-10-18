@@ -4,9 +4,6 @@ Small, operation-first resilience for .NET 10. Decorate delegates with rate
 limiting, retry, cooperative timeout, circuit breaking, or your own pattern.
 No HTTP dependency, pipelines, or registries.
 
-> **Alpha:** This package is in the alpha stage. Its public APIs may change,
-> including breaking changes, before a stable release.
-
 ## Usage
 
 ```csharp
@@ -95,6 +92,32 @@ public sealed class CustomResilience : IOperationResilience
 
 var decorated = operation.ResilientWith(new CustomResilience());
 ```
+
+## Publishing
+
+Publishing a stable GitHub Release with a tag such as `v1.0.0` runs the
+**Publish stable** workflow (`.github/workflows/stable.yml`). It runs the
+existing build checks, packs Laminar using the tag's version, and publishes to
+nuget.org using trusted publishing. Tags must use `vMAJOR.MINOR.PATCH`.
+Prereleases and tags containing a prerelease suffix are not published to nuget.org.
+Pushing a stable tag alone does not publish a package.
+
+Before publishing, add a trusted publishing policy on nuget.org with these values:
+
+| Field | Value |
+|---|---|
+| Repository owner | `Jaxelr` |
+| Repository | `Laminar` |
+| Workflow file | `stable.yml` (filename only) |
+| Environment | Leave empty |
+
+Add a GitHub Actions repository secret named `NUGET_USER` containing the nuget.org
+username associated with the policy (not an email address). No long-lived NuGet
+API key is required. The policy must allow publishing the `Laminar` package.
+Merge the workflow before publishing the release.
+
+Prerelease tags such as `v0.1.0-preview.1` continue to publish to GitHub Packages
+through the separate **Publish prerelease** workflow.
 
 ## Contributing
 
