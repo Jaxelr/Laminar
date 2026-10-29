@@ -43,6 +43,23 @@ public sealed class PolicyValidationTests
     }
 
     [Theory]
+    [InlineData(-1d)]
+    [InlineData(0d)]
+    [InlineData(0.5d)]
+    [InlineData(double.NaN)]
+    [InlineData(double.NegativeInfinity)]
+    [InlineData(double.PositiveInfinity)]
+    public void RetryConstructor_InvalidBackoffFactorThrowsImmediately(double factor)
+    {
+        // Arrange
+        var options = new RetryOptions { BackoffFactor = factor };
+        // Act
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => new RetryResilience(options));
+        // Assert
+        Assert.Equal("options", exception.ParamName);
+    }
+
+    [Theory]
     [InlineData("rate")]
     [InlineData("retry")]
     [InlineData("timeout")]

@@ -60,13 +60,30 @@ string result = await resilient(cancellationToken);
 | Pattern | Behavior |
 |---|---|
 | `RateLimitedBy` | Uses any .NET `RateLimiter`; queues according to its options, then throws `RateLimitRejectedException` on rejection. Optional `permitCount` defaults to 1. |
-| `Retryable` | Defaults to 3 retries with no delay. Cancellation and resilience rejections are excluded by default; customize `ShouldHandle` to select failures. |
+| `Retryable` | Defaults to 3 retries with no delay. Set `Delay` for fixed delays, or also set `BackoffFactor` for exponential backoff. Cancellation and resilience rejections are excluded by default; customize `ShouldHandle` to select failures. |
 | `TimedOutAfter` | Cancels the operation's token at the deadline and throws `TimeoutRejectedException`. Caller cancellation remains cancellation. |
 | `CircuitBrokenBy` | Opens after consecutive handled failures, throws `CircuitOpenException` while open, and admits one probe after the break duration. A successful probe closes it. |
 
 The last decorator is outermost: `operation.RateLimitedBy(limiter).Retryable()`
 acquires a permit for every attempt; `operation.Retryable().RateLimitedBy(limiter)`
 acquires once for the whole retry sequence.
+
+Retry delays start at `Delay` and are multiplied by `BackoffFactor` for each
+subsequent retry. The factor defaults to 1 (fixed delay) and must be finite and at
+least 1. For example, this retries after 2, 4, and 8 seconds:
+
+```csharp
+var retried = operation.Retryable(new RetryOptions
+{
+    MaxRetries = 3,
+    Delay = TimeSpan.FromSeconds(2),
+    BackoffFactor = 2
+});
+```
+
+Growing delays are capped at .NET's maximum timer duration (4,294,967,294
+milliseconds). A zero delay stays immediate regardless of the factor. Every
+invocation starts its own backoff sequence, and delays honor caller cancellation.
 
 Reuse a limiter or breaker to share its state across operations. You own the
 limiter's lifetime. Limits are in-process. Retry only operations safe to repeat.

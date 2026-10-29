@@ -15,6 +15,11 @@ public sealed class RetryResilience : IOperationResilience
         ArgumentNullException.ThrowIfNull(options);
         ArgumentOutOfRangeException.ThrowIfNegative(options.MaxRetries);
         FailureHandling.ValidateTimer(options.Delay, nameof(options.Delay), allowZero: true);
+        if (!double.IsFinite(options.BackoffFactor) || options.BackoffFactor < 1)
+        {
+            throw new ArgumentOutOfRangeException(nameof(options), options.BackoffFactor,
+                "BackoffFactor must be finite and at least 1.");
+        }
         ArgumentNullException.ThrowIfNull(options.ShouldHandle);
         ArgumentNullException.ThrowIfNull(options.TimeProvider);
         this.options = options;
@@ -44,11 +49,17 @@ public sealed class RetryResilience : IOperationResilience
             catch (Exception exception) when (!cancellationToken.IsCancellationRequested
                 && attempt < options.MaxRetries && options.ShouldHandle(exception))
             {
-                if (options.Delay > TimeSpan.Zero)
+                var delay = GetDelay(attempt);
+                if (delay > TimeSpan.Zero)
                 {
-                    await Task.Delay(options.Delay, options.TimeProvider, cancellationToken).ConfigureAwait(false);
+                    await Task.Delay(delay, options.TimeProvider, cancellationToken).ConfigureAwait(false);
                 }
             }
         }
     }
+
+    private TimeSpan GetDelay(int attempt)
+        => options.Delay == TimeSpan.Zero ? TimeSpan.Zero : TimeSpan.FromTicks((long) Math.Min(
+            options.Delay.Ticks * Math.Pow(options.BackoffFactor, attempt),
+            (uint.MaxValue - 1L) * TimeSpan.TicksPerMillisecond));
 }

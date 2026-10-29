@@ -15,6 +15,8 @@ public sealed record RetryOptions
     /// </summary>
     public TimeSpan Delay { get; init; }
 
+    public double BackoffFactor { get; init; } = 1;
+
     /// <summary>
     /// Gets the retry predicate. By default, cancellation and resilience rejection are excluded.
     /// </summary>
