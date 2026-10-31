@@ -145,6 +145,21 @@ Do not reintroduce these diagnostics in new code unless explicitly requested.
 - Keep unit tests up to date with behavior changes: add or adjust tests so they describe and validate the updated behavior.
 - If a code change intentionally does not require documentation or unit test updates, state the reason explicitly.
 
+## Release changelog
+
+- Every release, including prereleases, must have an entry in root `changelog.md`.
+- Add or update the entry in the same change set as the version bump, before
+  creating a release tag or publishing packages.
+- List releases newest first. Include the version, publication date, and concise
+  customer-facing changes, including compatibility or breaking changes.
+- Mark an upcoming version as `Unreleased` until publication; replace that marker
+  with the publication date when releasing.
+- Preserve historical entries and use Git tags and published releases to verify
+  their contents rather than inventing release history.
+- Keep `PackageReleaseNotes` pointing to
+  `https://github.com/Jaxelr/Laminar/blob/main/changelog.md` so NuGet customers can
+  find the complete changelog.
+
 ## Commit message conventions
 
 Use **semantic (conventional) commit messages** for all commits in this repository.

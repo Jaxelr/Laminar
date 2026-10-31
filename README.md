@@ -131,6 +131,11 @@ public sealed class CustomResilience : IOperationResilience
 var decorated = operation.ResilientWith(new CustomResilience());
 ```
 
+## Release notes
+
+See the [changelog](https://github.com/Jaxelr/Laminar/blob/main/changelog.md) for
+changes in every release, including prereleases.
+
 ## Contributing
 
 Issues and pull requests are welcome. For larger changes, open an issue first to
