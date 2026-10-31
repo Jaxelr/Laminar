@@ -2,6 +2,22 @@
 
 All releases, including prereleases, are listed below in newest-first order.
 
+## [0.1.2](https://github.com/Jaxelr/Laminar/releases/tag/v0.1.2) - 2026-10-31
+
+### Added
+
+- `ExecuteAsync` extensions on `IOperationResilience` for one-line execution of
+  `Task`- and `Task<T>`-returning delegates.
+- Overloads for cancellation-aware delegates and an optional caller cancellation
+  token.
+
+The helpers return `ValueTask` or `ValueTask<T>` and reuse the existing delegate
+adapters and resilience engine. Existing APIs remain unchanged.
+
+### Documentation
+
+- Added the complete release changelog and linked NuGet release notes to it.
+
 ## [0.1.1](https://github.com/Jaxelr/Laminar/releases/tag/v0.1.1) - 2026-10-31
 
 ### Added

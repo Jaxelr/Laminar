@@ -4,7 +4,8 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>0.1.1</Version>
+    <Version>0.1.2</Version>
+    <PackageReleaseNotes>https://github.com/Jaxelr/Laminar/blob/main/changelog.md</PackageReleaseNotes>
     <Authors>Jaxel Rojas</Authors>
     <Description>Small, composable, operation-first resilience for .NET delegates.</Description>
     <RepositoryUrl>https://github.com/Jaxelr/Laminar</RepositoryUrl>
