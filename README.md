@@ -31,6 +31,27 @@ delegates automatically. Async delegates may accept a cancellation token.
 Invoke the returned delegate with `await guarded(cancellationToken)`.
 Delegates with other arguments can be bound through a lambda.
 
+For immediate, one-line execution with an existing resilience pattern, use
+`ExecuteAsync`:
+
+```csharp
+var retry = new RetryResilience(new RetryOptions
+{
+    MaxRetries = 3,
+    Delay = TimeSpan.FromSeconds(2),
+    BackoffFactor = 2
+});
+
+string result = await retry.ExecuteAsync(
+    () => Task.FromResult("Hello, world!"));
+```
+
+`ExecuteAsync` accepts `Task`- and `Task<T>`-returning delegates, with or without
+a cancellation-token parameter. An optional caller token is passed as the second
+argument and forwarded to cancellation-aware delegates. The helpers return
+`ValueTask` or `ValueTask<T>` and use the same adapters and resilience behavior as
+`ResilientWith`. For reusable decorated delegates, keep using `ResilientWith`.
+
 ## Patterns
 
 ```csharp

@@ -5,6 +5,30 @@ namespace Laminar;
 /// </summary>
 public static class OperationExtensions
 {
+    public static ValueTask<TResult> ExecuteAsync<TResult>(
+        this IOperationResilience resilience,
+        Func<Task<TResult>> operation,
+        CancellationToken cancellationToken = default)
+        => operation.ResilientWith(resilience)(cancellationToken);
+
+    public static ValueTask ExecuteAsync(
+        this IOperationResilience resilience,
+        Func<Task> operation,
+        CancellationToken cancellationToken = default)
+        => operation.ResilientWith(resilience)(cancellationToken);
+
+    public static ValueTask<TResult> ExecuteAsync<TResult>(
+        this IOperationResilience resilience,
+        Func<CancellationToken, Task<TResult>> operation,
+        CancellationToken cancellationToken = default)
+        => operation.ResilientWith(resilience)(cancellationToken);
+
+    public static ValueTask ExecuteAsync(
+        this IOperationResilience resilience,
+        Func<CancellationToken, Task> operation,
+        CancellationToken cancellationToken = default)
+        => operation.ResilientWith(resilience)(cancellationToken);
+
     /// <summary>
     /// Adapts a synchronous result delegate and applies the supplied resilience pattern.
     /// </summary>
