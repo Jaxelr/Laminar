@@ -147,8 +147,21 @@ Do not reintroduce these diagnostics in new code unless explicitly requested.
 
 ## Release changelog
 
+- Every release version bump must be a standalone commit, for example
+  `chore(release): prepare version 0.1.3`.
+- Commit features, fixes, refactoring, tests, and general documentation changes
+  separately before the version bump. Never combine implementation changes with
+  a release version bump.
+- The version-bump commit may contain only version changes and directly related
+  release bookkeeping, including the required changelog and release-note updates.
+- Generate the new `changelog.md` release entry when preparing the version bump.
+  Review all commits since the previous release tag through the commit being
+  released, and summarize the complete set of changes for the new version.
+- Do not update the release changelog on individual feature, fix, or other
+  implementation commits. Include the generated entry only in the standalone
+  version-bump commit.
 - Every release, including prereleases, must have an entry in root `changelog.md`.
-- Add or update the entry in the same change set as the version bump, before
+- Add or update the entry in the same commit as the version bump, before
   creating a release tag or publishing packages.
 - List releases newest first. Include the version, publication date, and concise
   customer-facing changes, including compatibility or breaking changes.
