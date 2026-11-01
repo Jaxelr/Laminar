@@ -2,6 +2,27 @@
 
 All releases, including prereleases, are listed below in newest-first order.
 
+## [0.1.3](https://github.com/Jaxelr/Laminar/releases/tag/v0.1.3) - 2026-11-01
+
+### Added
+
+- Immediate-execution facades: `Retry.Retryable`, `Timeouts.TimedOutAfter`,
+  `RateLimit.RateLimitedBy`, and `CircuitBreaker.CircuitBrokenBy`.
+- Four overloads per facade for `Task`- and `Task<T>`-returning delegates, with or
+  without a cancellation-token parameter. Inline async lambdas infer result types
+  without an explicit delegate declaration.
+- Static imports for concise calls such as
+  `await Retryable(() => client.SendEmailAsync(message))`.
+
+The facades return `ValueTask` or `ValueTask<T>` and reuse the existing adapters
+and resilience engine. Timeouts remain cooperative and accept an optional
+`TimeProvider`; rate limiting and circuit breaking preserve the supplied shared
+instances and their state. Existing APIs and retry defaults remain unchanged.
+
+### Documentation
+
+- Added immediate-execution examples and shared-resource ownership guidance.
+
 ## [0.1.2](https://github.com/Jaxelr/Laminar/releases/tag/v0.1.2) - 2026-10-31
 
 ### Added

@@ -31,6 +31,63 @@ delegates automatically. Async delegates may accept a cancellation token.
 Invoke the returned delegate with `await guarded(cancellationToken)`.
 Delegates with other arguments can be bound through a lambda.
 
+For immediate retry execution, import the static facade:
+
+```csharp
+using Laminar;
+using static Laminar.Retry;
+
+await Retryable(() => client.SendEmailAsync(Message));
+```
+
+`Retryable` executes immediately and returns `ValueTask` or `ValueTask<T>` to
+await completion. It accepts `Task`- and `Task<T>`-returning delegates, including
+inline async lambdas, with or without a cancellation-token parameter. Results are
+inferred automatically:
+
+```csharp
+string result = await Retryable(async () => await ReadAsync());
+
+await Retryable(
+    token => client.SendEmailAsync(Message, token),
+    options: new RetryOptions { MaxRetries = 3, Delay = TimeSpan.FromSeconds(2) },
+    cancellationToken: cancellationToken);
+```
+
+Options are optional and use the same defaults and retry behavior as the
+`Retryable` extension. The optional caller token defaults to
+`CancellationToken.None` and is forwarded to cancellation-aware delegates.
+Unlike this immediate static facade, `operation.Retryable(options)` decorates a
+reusable delegate without executing it; invoke that delegate with
+`await retried(cancellationToken)` each time you need it.
+
+The other patterns have matching immediate-execution facades:
+
+```csharp
+using static Laminar.Timeouts;
+using static Laminar.RateLimit;
+using static Laminar.CircuitBreaker;
+
+string result = await TimedOutAfter(
+    token => ReadAsync(token), TimeSpan.FromSeconds(5),
+    cancellationToken: cancellationToken);
+
+await RateLimitedBy(() => SendAsync(), limiter, permitCount: 2);
+await CircuitBrokenBy(() => SendAsync(), breaker);
+```
+
+Each facade accepts `Task`- and `Task<T>`-returning delegates, with or without a
+cancellation-token parameter, and returns `ValueTask` or `ValueTask<T>`.
+`TimedOutAfter` requires an explicit timeout and optionally accepts a
+`TimeProvider`. Timeout remains cooperative: it waits for the operation to finish
+before rejecting a late result. `Timeouts` avoids a name collision with .NET's
+`System.Threading.Timeout`.
+
+Pass an existing limiter or breaker to `RateLimitedBy` or `CircuitBrokenBy`.
+Repeated calls use that same instance's state; the facades neither create nor
+dispose these shared dependencies. You own the limiter's lifetime. The existing
+delegate extensions remain the way to compose reusable operations.
+
 For immediate, one-line execution with an existing resilience pattern, use
 `ExecuteAsync`:
 
