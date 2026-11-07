@@ -37,7 +37,7 @@ jobs:
             throw "Stable release tags must use vMAJOR.MINOR.PATCH, for example v1.0.0."
           }
           $version = $env:GITHUB_REF_NAME.Substring(1)
-          dotnet pack src\Laminar\Laminar.csproj --configuration Release --output artifacts --warnaserror -p:Version=$version -p:ContinuousIntegrationBuild=true
+          dotnet pack src\Laminar.csproj --configuration Release --output artifacts --warnaserror -p:Version=$version -p:ContinuousIntegrationBuild=true
       - name: NuGet login
         uses: NuGet/login@v1
         id: login

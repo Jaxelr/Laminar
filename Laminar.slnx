@@ -16,9 +16,9 @@
     <File Path=".github/workflows/prerelease.yml" />
   </Folder>
   <Folder Name="/src/">
-    <Project Path="src/Laminar/Laminar.csproj" />
+    <Project Path="src/Laminar.csproj" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="tests/Laminar.Tests/Laminar.Tests.csproj" />
+    <Project Path="tests/Laminar.Tests.csproj" />
   </Folder>
 </Solution>

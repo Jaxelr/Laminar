@@ -34,7 +34,7 @@ jobs:
         shell: pwsh
         env:
           PACKAGE_VERSION: ${{ steps.version.outputs.version }}
-        run: dotnet pack src\Laminar\Laminar.csproj --configuration Release --output artifacts --warnaserror -p:Version=$env:PACKAGE_VERSION -p:ContinuousIntegrationBuild=true
+        run: dotnet pack src\Laminar.csproj --configuration Release --output artifacts --warnaserror -p:Version=$env:PACKAGE_VERSION -p:ContinuousIntegrationBuild=true
       - name: Publish to GitHub Packages
         shell: pwsh
         env:
