@@ -6,6 +6,14 @@ No HTTP dependency, pipelines, or registries.
 
 ## Usage
 
+| Use case | API |
+|---|---|
+| Execute an async operation immediately | `Retry.Retryable`, `Timeouts.TimedOutAfter`, `RateLimit.RateLimitedBy`, or `CircuitBreaker.CircuitBrokenBy` |
+| Execute with an existing resilience instance | `resilience.ExecuteAsync(operation, cancellationToken)` |
+| Decorate and compose a reusable delegate | `operation.Retryable()`, `.TimedOutAfter(...)`, `.RateLimitedBy(...)`, `.CircuitBrokenBy(...)`, or `.ResilientWith(...)` |
+
+### Reusable delegates
+
 ```csharp
 using System.Threading.RateLimiting;
 using Laminar;
@@ -31,13 +39,15 @@ delegates automatically. Async delegates may accept a cancellation token.
 Invoke the returned delegate with `await guarded(cancellationToken)`.
 Delegates with other arguments can be bound through a lambda.
 
-For immediate retry execution, import the static facade:
+### Immediate retry
+
+Import the static facade to execute an operation without declaring a delegate:
 
 ```csharp
 using Laminar;
 using static Laminar.Retry;
 
-await Retryable(() => client.SendEmailAsync(Message));
+string message = await Retryable(() => File.ReadAllTextAsync("message.txt"));
 ```
 
 `Retryable` executes immediately and returns `ValueTask` or `ValueTask<T>` to
@@ -46,11 +56,20 @@ inline async lambdas, with or without a cancellation-token parameter. Results ar
 inferred automatically:
 
 ```csharp
-string result = await Retryable(async () => await ReadAsync());
+using var cancellation = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+var cancellationToken = cancellation.Token;
+
+string result = await Retryable(async () => await File.ReadAllTextAsync("message.txt"));
 
 await Retryable(
-    token => client.SendEmailAsync(Message, token),
-    options: new RetryOptions { MaxRetries = 3, Delay = TimeSpan.FromSeconds(2) },
+    token => File.WriteAllTextAsync("output.txt", result, token),
+    options: new RetryOptions
+    {
+        MaxRetries = 3,
+        Delay = TimeSpan.FromSeconds(2),
+        BackoffFactor = 2,
+        ShouldHandle = exception => exception is IOException
+    },
     cancellationToken: cancellationToken);
 ```
 
@@ -61,19 +80,44 @@ Unlike this immediate static facade, `operation.Retryable(options)` decorates a
 reusable delegate without executing it; invoke that delegate with
 `await retried(cancellationToken)` each time you need it.
 
-The other patterns have matching immediate-execution facades:
+### Immediate timeout, rate limiting, and circuit breaking
+
+The other patterns have matching immediate-execution facades. This example
+creates a shared limiter and breaker and passes a caller token to each operation:
 
 ```csharp
+using System.Threading.RateLimiting;
+using Laminar;
 using static Laminar.Timeouts;
 using static Laminar.RateLimit;
 using static Laminar.CircuitBreaker;
 
+using var cancellation = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+var cancellationToken = cancellation.Token;
+using var limiter = new ConcurrencyLimiter(new ConcurrencyLimiterOptions
+{
+    PermitLimit = 2,
+    QueueLimit = 5,
+    QueueProcessingOrder = QueueProcessingOrder.OldestFirst
+});
+var breaker = new CircuitBreakerResilience(new CircuitBreakerOptions
+{
+    FailureThreshold = 5,
+    BreakDuration = TimeSpan.FromSeconds(30)
+});
+
 string result = await TimedOutAfter(
-    token => ReadAsync(token), TimeSpan.FromSeconds(5),
+    token => File.ReadAllTextAsync("message.txt", token),
+    TimeSpan.FromSeconds(5),
     cancellationToken: cancellationToken);
 
-await RateLimitedBy(() => SendAsync(), limiter, permitCount: 2);
-await CircuitBrokenBy(() => SendAsync(), breaker);
+await RateLimitedBy(
+    token => File.WriteAllTextAsync("output.txt", result, token),
+    limiter, permitCount: 2, cancellationToken: cancellationToken);
+
+string content = await CircuitBrokenBy(
+    token => File.ReadAllTextAsync("output.txt", token),
+    breaker, cancellationToken: cancellationToken);
 ```
 
 Each facade accepts `Task`- and `Task<T>`-returning delegates, with or without a
@@ -88,10 +132,16 @@ Repeated calls use that same instance's state; the facades neither create nor
 dispose these shared dependencies. You own the limiter's lifetime. The existing
 delegate extensions remain the way to compose reusable operations.
 
+### Execute with an existing resilience instance
+
 For immediate, one-line execution with an existing resilience pattern, use
 `ExecuteAsync`:
 
 ```csharp
+using Laminar;
+
+using var cancellation = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+var cancellationToken = cancellation.Token;
 var retry = new RetryResilience(new RetryOptions
 {
     MaxRetries = 3,
@@ -100,7 +150,12 @@ var retry = new RetryResilience(new RetryOptions
 });
 
 string result = await retry.ExecuteAsync(
-    () => Task.FromResult("Hello, world!"));
+    token => File.ReadAllTextAsync("message.txt", token),
+    cancellationToken);
+
+await retry.ExecuteAsync(
+    token => File.WriteAllTextAsync("output.txt", result, token),
+    cancellationToken);
 ```
 
 `ExecuteAsync` accepts `Task`- and `Task<T>`-returning delegates, with or without
