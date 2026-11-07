@@ -1,6 +1,6 @@
 # Laminar
 
-Small, operation-first resilience for .NET 10. Decorate delegates with rate
+Small, operation-first resilience for .NET. Decorate delegates with rate
 limiting, retry, cooperative timeout, circuit breaking, or your own pattern.
 No HTTP dependency, pipelines, or registries.
 
