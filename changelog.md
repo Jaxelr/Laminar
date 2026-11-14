@@ -2,6 +2,28 @@
 
 All releases, including prereleases, are listed below in newest-first order.
 
+## [0.2.0](https://github.com/Jaxelr/Laminar/releases/tag/v0.2.0) - 2026-11-14
+
+### Added
+
+- .NET 11 target alongside .NET 10, with framework-specific rate-limiting
+  dependencies. Existing public APIs and resilience behavior remain unchanged.
+
+### Development
+
+- Building from source now requires the .NET 11 SDK. CI builds and tests both
+  frameworks, and build and release workflows install both SDKs.
+- Flattened the source and test project folders and grouped facades and internal
+  helpers without changing public APIs.
+- Scheduled monthly NuGet dependency checks with Dependabot.
+- Documented standalone version bumps and release-time changelog updates.
+
+### Documentation
+
+- Added an API-selection table and expanded delegate, cancellation, and
+  shared-resource examples.
+- Updated the supported framework description to .NET 10+.
+
 ## [0.1.3](https://github.com/Jaxelr/Laminar/releases/tag/v0.1.3) - 2026-11-01
 
 ### Added
